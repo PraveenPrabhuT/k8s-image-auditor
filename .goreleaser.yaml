@@ -51,12 +51,12 @@ checksum:
 brews:
   - name: k8s-image-auditor
     repository:
-      owner: <YOUR_USERNAME>
-      name: homebrew-tools
+      owner: PraveenPrabhuT
+      name: homebrew-tap
       token: "{{ .Env.GORELEASER_TOKEN }}"
     
     description: "Audits container images for architecture compatibility"
-    homepage: "https://github.com/<YOUR_USERNAME>/k8s-image-auditor"
+    homepage: "https://github.com/PraveenPrabhuT/k8s-image-auditor"
     license: "MIT"
 
     # Runtime Dependencies
