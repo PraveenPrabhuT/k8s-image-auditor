@@ -21,7 +21,8 @@ builds:
       - arm64
 
     main: .
-    binary: k8s-image-auditor
+    # FIX: Keep the .sh extension so the Makefile finds the source file!
+    binary: k8s-image-auditor.sh
 
     # Disable CGO for pure static builds (faster/safer for dummy builds)
     env:
