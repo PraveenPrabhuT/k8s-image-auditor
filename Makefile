@@ -56,13 +56,24 @@ install: check all
 	@mkdir -p $(MANDIR)
 	@install -m 644 $(MAN_OUT) $(MANDIR)/$(MAN_OUT)
 
-	@echo "Installing bash completions to $(BASH_COMPLETION_DIR)..."
-	@mkdir -p $(BASH_COMPLETION_DIR)
-	@install -m 644 $(BASH_COMPLETION_SRC) $(BASH_COMPLETION_DIR)/$(BINARY_NAME)
-
-	@echo "Installing zsh completions to $(ZSH_COMPLETION_DIR)..."
-	@mkdir -p $(ZSH_COMPLETION_DIR)
-	@install -m 644 $(ZSH_COMPLETION_SRC) $(ZSH_COMPLETION_DIR)/$(ZSH_COMPLETION_SRC)
+	@echo "Detecting shell to install appropriate completions..."
+	@CUR_SHELL=$$(basename $$SHELL); \
+	if [ "$$CUR_SHELL" = "zsh" ]; then \
+		echo "🐚 Detected Zsh. Installing Zsh completions..."; \
+		mkdir -p $(ZSH_COMPLETION_DIR); \
+		install -m 644 $(ZSH_COMPLETION_SRC) $(ZSH_COMPLETION_DIR)/$(ZSH_COMPLETION_SRC); \
+		echo "ℹ️  Zsh users: Ensure $(ZSH_COMPLETION_DIR) is in your \$$fpath."; \
+	elif [ "$$CUR_SHELL" = "bash" ]; then \
+		echo "🐚 Detected Bash. Installing Bash completions..."; \
+		mkdir -p $(BASH_COMPLETION_DIR); \
+		install -m 644 $(BASH_COMPLETION_SRC) $(BASH_COMPLETION_DIR)/$(BINARY_NAME); \
+	else \
+		echo "⚠️  Unknown shell ($$CUR_SHELL). Installing BOTH completions to be safe."; \
+		mkdir -p $(BASH_COMPLETION_DIR); \
+		install -m 644 $(BASH_COMPLETION_SRC) $(BASH_COMPLETION_DIR)/$(BINARY_NAME); \
+		mkdir -p $(ZSH_COMPLETION_DIR); \
+		install -m 644 $(ZSH_COMPLETION_SRC) $(ZSH_COMPLETION_DIR)/$(ZSH_COMPLETION_SRC); \
+	fi
 
 	@echo "✅ Installation complete!"
 	@# Check if the bin directory is in the user's PATH (Handle trailing slash)
@@ -70,7 +81,6 @@ install: check all
 		*":$(BINDIR):"*|*":$(BINDIR)/:"*) ;; \
 		*) echo "⚠️  WARNING: $(BINDIR) is not in your \$$PATH. Add it to your shell profile." ;; \
 	esac
-	@echo "ℹ️  Zsh users: Ensure $(ZSH_COMPLETION_DIR) is in your \$$fpath."
 
 # Uninstall
 uninstall:
