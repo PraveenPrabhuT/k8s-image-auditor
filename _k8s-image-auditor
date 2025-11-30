@@ -3,7 +3,7 @@
 # This is a native Zsh completion script.
 # It provides rich dropdown menus for Architectures, Regions, and AWS Profiles.
 
-_k8s_image_auditor() {
+_k8s-image-auditor() {
     local -a architectures regions profiles
 
     # 1. Static list of common architectures
