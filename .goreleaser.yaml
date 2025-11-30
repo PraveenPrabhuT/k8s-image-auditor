@@ -1,52 +1,72 @@
 project_name: k8s-image-auditor
 
-# 1. Build: We skip this because it's Bash, not a compiled binary.
-builds:
-  - skip: true
+# 0. PRE-HOOK: Create the dummy file automatically
+before:
+  hooks:
+    # This creates the file GoReleaser needs to "compile"
+    - sh -c 'echo "package main; func main() {}" > main.go'
 
-# 2. Archive: How to zip up the source code for the release.
+# 1. BUILD: The "Fake" Build
+builds:
+  - id: k8s-image-auditor
+    
+    # We force GoReleaser to create artifacts for these targets
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+    # We point to the current directory (where main.go now exists)
+    main: .
+    
+    # We name the binary exactly what we want the script to be called
+    binary: k8s-image-auditor
+
+    env:
+      - CGO_ENABLED=0
+
+    # THE MAGIC: Immediately overwrite the useless Go binary with our Bash script
+    hooks:
+      post:
+        - cp k8s-image-auditor.sh {{ .Path }}
+
+# 2. ARCHIVES: Package the "binary" (which is now our script) + docs
 archives:
   - id: default
     format: tar.gz
-    # This creates a standard folder structure inside the tarball
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
-    # We explicitly include the files needed for 'make install' to work
     files:
-      - src: k8s-image-auditor.sh
       - src: Makefile
       - src: k8s-image-auditor.1.md
       - src: completions.bash
       - src: _k8s-image-auditor
 
-# 3. Checksums: Required for Homebrew
 checksum:
   name_template: 'checksums.txt'
 
-# 4. Homebrew: The Magic Step
+# 3. HOMEBREW: Update the Tap
 brews:
   - name: k8s-image-auditor
-    
-    # The repository where the Formula will be pushed
     repository:
       owner: PraveenPrabhuT
-      name: homebrew-tap # Your tap repo name
+      name: homebrew-tools
       token: "{{ .Env.GORELEASER_TOKEN }}"
-
-    # Description for the Formula
+    
     description: "Audits container images for architecture compatibility"
     homepage: "https://github.com/PraveenPrabhuT/k8s-image-auditor"
     license: "MIT"
 
-    # Runtime Dependencies (must match what we wrote manually before)
+    # Runtime Dependencies
     dependencies:
       - name: jq
       - name: kubernetes-cli
       - name: skopeo
       - name: awscli
-      - name: pandoc
+      - name: pandoc # Moved here to fix the previous error
 
-    # The Install Command
-    # GoReleaser injects this ruby code into the Formula
+    # The install command that Homebrew will run
     install: |
       system "make", "install", "PREFIX=#{prefix}"
     
