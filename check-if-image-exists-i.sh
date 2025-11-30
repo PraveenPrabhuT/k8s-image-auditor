@@ -19,6 +19,23 @@ YELLOW='\033[0;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# --- Signal Handling & Cleanup ---
+function cleanup() {
+    # Only run if the file actually exists
+    if [[ -f "$TEMP_IMG_LIST" ]]; then
+        # Check if debug mode is on (optional), otherwise remove
+        rm -f "$TEMP_IMG_LIST"
+    fi
+    # Reset terminal colors just in case we crashed mid-color
+    echo -ne "${NC}"
+}
+
+# Trap these signals:
+# EXIT = Runs when script ends normally OR by error
+# SIGINT = Runs when you press Ctrl+C
+# SIGTERM = Runs when a kill command is sent
+trap cleanup EXIT SIGINT SIGTERM
+
 # --- Helper Functions ---
 
 function usage() {
