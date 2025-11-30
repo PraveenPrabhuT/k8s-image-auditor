@@ -125,14 +125,14 @@ for arg in "$@"; do
   esac
 done
 
-while getopts ":a:p:r:o:sh" opt; do
+while getopts ":a:p:r:o:shv" opt; do
   case ${opt} in
     a) TARGET_ARCH="$OPTARG" ;;
     p) AWS_PROFILE_NAME="$OPTARG" ;;
     r) AWS_REGION="$OPTARG" ;;
     o) OUTPUT_FILE="$OPTARG" ;;
     s) DO_AWS_LOGIN=false ;; # Flag to SKIP login
-    v) echo "k8s-image-auditor version $VERSION"; exit 0 ;; # Exit immediately after printing
+    v) echo "k8s-image-auditor version $VERSION"; exit 0 ;;
     h) usage; exit 0 ;;
     \?) echo -e "${RED}Invalid option: -$OPTARG${NC}" >&2; usage; exit 1 ;;
   esac
