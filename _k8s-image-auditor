@@ -1,0 +1,46 @@
+#compdef k8s-image-auditor
+
+# This is a native Zsh completion script.
+# It provides rich dropdown menus for Architectures, Regions, and AWS Profiles.
+
+_k8s_image_auditor() {
+    local -a architectures regions profiles
+
+    # 1. Static list of common architectures
+    architectures=('amd64' 'arm64' 'arm' 'v7' 'v8' 'ppc64le' 's390x')
+
+    # 2. Static list of common AWS Regions
+    regions=(
+        'ap-south-1:Mumbai'
+        'us-east-1:N. Virginia'
+        'us-east-2:Ohio'
+        'us-west-1:N. California'
+        'us-west-2:Oregon'
+        'eu-central-1:Frankfurt'
+        'eu-west-1:Ireland'
+        'eu-west-2:London'
+        'ap-southeast-1:Singapore'
+        'ap-southeast-2:Sydney'
+        'ap-northeast-1:Tokyo'
+    )
+
+    # 3. Dynamic AWS Profile Scraper
+    # Reads ~/.aws/credentials to suggest real profile names
+    if [[ -r ~/.aws/credentials ]]; then
+        # Grep profile names inside brackets [], remove brackets
+        profiles=($(grep -oE '^\[([a-zA-Z0-9_-]+)\]' ~/.aws/credentials | tr -d '[]'))
+    fi
+
+    # 4. The Arguments Definition
+    # -s: Allow stacking options (though not really used here)
+    # [Description]:argument_name:(list of options)
+    _arguments -s \
+        '-a[Target architecture]:architecture:($architectures)' \
+        '-p[AWS Profile to use]:profile:($profiles)' \
+        '-r[AWS Region]:region:(($regions))' \
+        '-o[Output CSV filename]:filename:_files' \
+        '-s[Skip AWS Login]' \
+        '-h[Show help message]'
+}
+
+_k8s_image_auditor "$@"

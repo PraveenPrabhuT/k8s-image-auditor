@@ -4,10 +4,13 @@ PREFIX ?= $(HOME)/.local
 BINDIR ?= $(PREFIX)/bin
 MANDIR ?= $(PREFIX)/share/man/man1
 
-# Completion Configuration
-# Standard location for user-local bash completions (XDG)
-COMPLETION_DIR ?= $(PREFIX)/share/bash-completion/completions
-COMPLETION_SRC = completions.bash
+# Bash Completion Configuration (XDG)
+BASH_COMPLETION_DIR ?= $(PREFIX)/share/bash-completion/completions
+BASH_COMPLETION_SRC = completions.bash
+
+# Zsh Completion Configuration (XDG)
+ZSH_COMPLETION_DIR ?= $(PREFIX)/share/zsh/site-functions
+ZSH_COMPLETION_SRC = _k8s-image-auditor
 
 # Files
 SCRIPT_SRC = k8s-image-auditor.sh
@@ -53,9 +56,13 @@ install: check all
 	@mkdir -p $(MANDIR)
 	@install -m 644 $(MAN_OUT) $(MANDIR)/$(MAN_OUT)
 
-	@echo "Installing shell completions to $(COMPLETION_DIR)..."
-	@mkdir -p $(COMPLETION_DIR)
-	@install -m 644 $(COMPLETION_SRC) $(COMPLETION_DIR)/$(BINARY_NAME)
+	@echo "Installing bash completions to $(BASH_COMPLETION_DIR)..."
+	@mkdir -p $(BASH_COMPLETION_DIR)
+	@install -m 644 $(BASH_COMPLETION_SRC) $(BASH_COMPLETION_DIR)/$(BINARY_NAME)
+
+	@echo "Installing zsh completions to $(ZSH_COMPLETION_DIR)..."
+	@mkdir -p $(ZSH_COMPLETION_DIR)
+	@install -m 644 $(ZSH_COMPLETION_SRC) $(ZSH_COMPLETION_DIR)/$(ZSH_COMPLETION_SRC)
 
 	@echo "✅ Installation complete!"
 	@# Check if the bin directory is in the user's PATH (Handle trailing slash)
@@ -63,6 +70,7 @@ install: check all
 		*":$(BINDIR):"*|*":$(BINDIR)/:"*) ;; \
 		*) echo "⚠️  WARNING: $(BINDIR) is not in your \$$PATH. Add it to your shell profile." ;; \
 	esac
+	@echo "ℹ️  Zsh users: Ensure $(ZSH_COMPLETION_DIR) is in your \$$fpath."
 
 # Uninstall
 uninstall:
@@ -70,8 +78,10 @@ uninstall:
 	@rm -f $(BINDIR)/$(BINARY_NAME)
 	@echo "Removing man page..."
 	@rm -f $(MANDIR)/$(MAN_OUT)
-	@echo "Removing completion script..."
-	@rm -f $(COMPLETION_DIR)/$(BINARY_NAME)
+	@echo "Removing bash completions..."
+	@rm -f $(BASH_COMPLETION_DIR)/$(BINARY_NAME)
+	@echo "Removing zsh completions..."
+	@rm -f $(ZSH_COMPLETION_DIR)/$(ZSH_COMPLETION_SRC)
 	@echo "🗑️  Uninstalled successfully."
 
 # Clean build artifacts
