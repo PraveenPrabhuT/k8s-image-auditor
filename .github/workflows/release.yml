@@ -40,7 +40,8 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
-          version: latest
+          # Fixes "Warning: You are using 'latest' as default version"
+          version: '~> v1'
           args: release --clean
         env:
           # Uses the standard token for the release in current repo

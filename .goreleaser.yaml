@@ -43,9 +43,6 @@ brews:
       - name: kubernetes-cli
       - name: skopeo
       - name: awscli
-
-    # Build Dependencies
-    build_dependencies:
       - name: pandoc
 
     # The Install Command
