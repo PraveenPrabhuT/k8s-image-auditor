@@ -48,7 +48,7 @@ function usage() {
     echo "  -r <region>   AWS Region (default: ap-south-1)"
     echo "  -o <file>     Output filename (default: image_audit_report_TIMESTAMP.csv)"
     echo "  -s            Skip AWS Login (use if checking public/local images only)"
-    echo "  -h            Show this help message"
+    echo "  -h --help     Show this help message"
 }
 
 function perform_aws_login() {
@@ -113,6 +113,14 @@ function check_dependencies() {
 }
 
 # --- Argument Parsing ---
+for arg in "$@"; do
+  case "$arg" in
+    --help)
+      usage
+      exit 0
+      ;;
+  esac
+done
 
 while getopts ":a:p:r:o:sh" opt; do
   case ${opt} in
