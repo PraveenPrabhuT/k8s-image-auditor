@@ -1,16 +1,18 @@
 project_name: k8s-image-auditor
 
-# 0. PRE-HOOK: Create the dummy file automatically
+# 0. PRE-HOOKS: Setup the "Fake" Go Environment
 before:
   hooks:
-    # This creates the file GoReleaser needs to "compile"
+    # 1. Create the dummy Go file
     - sh -c 'echo "package main; func main() {}" > main.go'
+    # 2. Initialize a dummy Go module (Fixes "cannot find main module" error)
+    - sh -c 'go mod init k8s-image-auditor || true'
 
 # 1. BUILD: The "Fake" Build
 builds:
   - id: k8s-image-auditor
     
-    # We force GoReleaser to create artifacts for these targets
+    # Force creation of artifacts for these OS/Arch combos
     goos:
       - linux
       - darwin
@@ -18,24 +20,23 @@ builds:
       - amd64
       - arm64
 
-    # We point to the current directory (where main.go now exists)
     main: .
-    
-    # We name the binary exactly what we want the script to be called
     binary: k8s-image-auditor
 
+    # Disable CGO for pure static builds (faster/safer for dummy builds)
     env:
       - CGO_ENABLED=0
 
-    # THE MAGIC: Immediately overwrite the useless Go binary with our Bash script
+    # THE MAGIC: Overwrite the compiled binary with our Bash script
     hooks:
       post:
         - cp k8s-image-auditor.sh {{ .Path }}
 
-# 2. ARCHIVES: Package the "binary" (which is now our script) + docs
+# 2. ARCHIVES: Package the script + docs
 archives:
   - id: default
     format: tar.gz
+    # Standard naming convention for Homebrew
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     files:
       - src: Makefile
@@ -50,12 +51,12 @@ checksum:
 brews:
   - name: k8s-image-auditor
     repository:
-      owner: PraveenPrabhuT
+      owner: <YOUR_USERNAME>
       name: homebrew-tools
       token: "{{ .Env.GORELEASER_TOKEN }}"
     
     description: "Audits container images for architecture compatibility"
-    homepage: "https://github.com/PraveenPrabhuT/k8s-image-auditor"
+    homepage: "https://github.com/<YOUR_USERNAME>/k8s-image-auditor"
     license: "MIT"
 
     # Runtime Dependencies
@@ -64,9 +65,8 @@ brews:
       - name: kubernetes-cli
       - name: skopeo
       - name: awscli
-      - name: pandoc # Moved here to fix the previous error
+      - name: pandoc
 
-    # The install command that Homebrew will run
     install: |
       system "make", "install", "PREFIX=#{prefix}"
     
