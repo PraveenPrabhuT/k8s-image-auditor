@@ -1,0 +1,65 @@
+name: Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-on-kind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Install Dependencies
+      - name: Install Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo jq
+          # kubectl is built-in
+
+      # 2. Spin up a local K8s Cluster (Kind)
+      - name: Create Kind Cluster
+        uses: helm/kind-action@v1.8.0
+
+      # 3. Deploy a Test Pod (Nginx)
+      - name: Deploy Test Pod
+        run: |
+          kubectl run nginx-test --image=nginx:alpine --restart=Never
+          kubectl wait --for=condition=Ready pod/nginx-test --timeout=60s
+
+          # Deploy a Multi-Arch image to test that logic too
+          kubectl run multi-arch-test --image=busybox:latest --restart=Never
+          kubectl wait --for=condition=Ready pod/multi-arch-test --timeout=60s
+
+      # 4. Run the Auditor (Dry run, skip AWS login)
+      - name: Run Auditor
+        run: |
+          chmod +x k8s-image-auditor.sh
+          # -s skips AWS login (since these are public Docker Hub images)
+          ./k8s-image-auditor.sh -s -o integration_report.csv
+
+      # 5. Verify Results
+      - name: Verify Output
+        run: |
+          echo "Content of Report:"
+          cat integration_report.csv
+
+          # Check if nginx is found and marked OK
+          if grep -q "nginx:alpine" integration_report.csv; then
+             echo "✅ Found nginx pod"
+          else
+             echo "❌ Failed to find nginx pod"
+             exit 1
+          fi
+
+          # Check if busybox is found
+          if grep -q "busybox:latest" integration_report.csv; then
+             echo "✅ Found busybox pod"
+          else
+             echo "❌ Failed to find busybox pod"
+             exit 1
+          fi
+
+          echo "🎉 Integration Test Passed!"
