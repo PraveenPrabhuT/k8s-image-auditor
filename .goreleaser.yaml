@@ -56,6 +56,9 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.GORELEASER_TOKEN }}"
     
+    # FIX: Explicitly target the Formula folder to overwrite the correct file
+    directory: Formula
+
     description: "Audits container images for architecture compatibility"
     homepage: "https://github.com/PraveenPrabhuT/k8s-image-auditor"
     license: "MIT"
