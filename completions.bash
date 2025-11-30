@@ -7,7 +7,7 @@ _k8s_image_auditor_completions() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     
     # The flags our tool accepts
-    opts="-a -p -r -o -s -h"
+    opts="-a -p -r -o -s -h -v"
 
     case "${prev}" in
         -a)

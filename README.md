@@ -87,6 +87,7 @@ Options:
   -r <region>   AWS Region (default: ap-south-1)
   -o <file>     Output filename (default: image_audit_report_TIMESTAMP.csv)
   -s            Skip AWS Login
+  -v            Show version info
   -h            Show help message
 ```
 

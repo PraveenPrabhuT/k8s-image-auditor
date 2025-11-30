@@ -34,6 +34,7 @@ _k8s-image-auditor() {
         '-r[AWS Region]:region:(($regions))' \
         '-o[Output CSV filename]:filename:_files' \
         '-s[Skip AWS Login]' \
+        '-v[Show version]' \
         '-h[Show help message]'
 }
 

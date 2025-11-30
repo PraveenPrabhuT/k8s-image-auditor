@@ -31,6 +31,7 @@ builds:
     hooks:
       post:
         - cp k8s-image-auditor.sh {{ .Path }}
+        - sed -i 's/VERSION="0.0.0-dev"/VERSION="{{ .Version }}"/' {{ .Path }}
 
 # 2. ARCHIVES: Package the script + docs
 archives:

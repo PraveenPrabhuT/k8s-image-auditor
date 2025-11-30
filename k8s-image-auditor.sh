@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+VERSION="0.0.0-dev" #placeholder version to be replaced by goreleaser
+
 # --- Configuration & Defaults ---
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 TARGET_ARCH="amd64"
@@ -48,6 +50,7 @@ function usage() {
     echo "  -r <region>   AWS Region (default: ap-south-1)"
     echo "  -o <file>     Output filename (default: image_audit_report_TIMESTAMP.csv)"
     echo "  -s            Skip AWS Login (use if checking public/local images only)"
+    echo "  -v            Show version info"
     echo "  -h --help     Show this help message"
 }
 
@@ -129,6 +132,7 @@ while getopts ":a:p:r:o:sh" opt; do
     r) AWS_REGION="$OPTARG" ;;
     o) OUTPUT_FILE="$OPTARG" ;;
     s) DO_AWS_LOGIN=false ;; # Flag to SKIP login
+    v) echo "k8s-image-auditor version $VERSION"; exit 0 ;; # Exit immediately after printing
     h) usage; exit 0 ;;
     \?) echo -e "${RED}Invalid option: -$OPTARG${NC}" >&2; usage; exit 1 ;;
   esac

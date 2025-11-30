@@ -27,6 +27,9 @@ It determines if the image supports the target architecture (e.g., amd64, arm64)
 **-s**
 :   Skip AWS Login. Useful for checking public images without credentials.
 
+**-v**
+:   Show version information.
+
 **-h**
 :   Show help message.
 
