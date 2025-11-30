@@ -3,12 +3,15 @@
 PREFIX ?= $(HOME)/.local
 BINDIR ?= $(PREFIX)/bin
 MANDIR ?= $(PREFIX)/share/man/man1
+COMPLETION_DIR = $(PREFIX)/share/bash-completion/completions
+
 
 # Files
 SCRIPT_SRC = k8s-image-auditor.sh
 BINARY_NAME = k8s-image-auditor
 MAN_SRC = k8s-image-auditor.1.md
 MAN_OUT = k8s-image-auditor.1
+COMPLETION_SRC = completions.bash
 
 # --- Targets ---
 
@@ -34,7 +37,10 @@ install: check all
 	@echo "Installing man page to $(MANDIR)..."
 	@mkdir -p $(MANDIR)
 	@install -m 644 $(MAN_OUT) $(MANDIR)/$(MAN_OUT)
-
+	@echo "Installing shell completions..."
+	@mkdir -p $(COMPLETION_DIR)
+	# We rename it to match the binary name exactly so the shell finds it
+	@install -m 644 $(COMPLETION_SRC) $(COMPLETION_DIR)/$(BINARY_NAME)
 	@echo "✅ Installation complete!"
 	@# Check if the bin directory is in the user's PATH
 	@case ":$$PATH:" in \
@@ -48,6 +54,7 @@ uninstall:
 	@rm -f $(BINDIR)/$(BINARY_NAME)
 	@echo "Removing man page..."
 	@rm -f $(MANDIR)/$(MAN_OUT)
+	@rm -f $(COMPLETION_DIR)/$(BINARY_NAME)
 	@echo "🗑️  Uninstalled successfully."
 
 lint:
