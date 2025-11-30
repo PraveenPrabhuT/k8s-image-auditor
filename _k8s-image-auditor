@@ -1,11 +1,11 @@
 #compdef k8s-image-auditor
-# This is a native Zsh completion script.
-# It provides rich dropdown menus for Architectures, Regions, and AWS Profiles.
+
+# Function name uses hyphens to match the binary name
 _k8s-image-auditor() {
     local -a architectures regions profiles
-    # 1. Static list of common architectures
+
     architectures=('amd64' 'arm64' 'arm' 'v7' 'v8' 'ppc64le' 's390x')
-    # 2. Static list of common AWS Regions
+
     regions=(
         'ap-south-1:Mumbai'
         'us-east-1:N. Virginia'
@@ -17,17 +17,13 @@ _k8s-image-auditor() {
         'eu-west-2:London'
         'ap-southeast-1:Singapore'
         'ap-southeast-2:Sydney'
+        'ap-northeast-1:Tokyo'
     )
-    # 3. Dynamic AWS Profile Scraper
-    # Reads ~/.aws/credentials to suggest real profile names
+
     if [[ -r ~/.aws/credentials ]]; then
-        # Grep profile names inside brackets [], remove brackets
         profiles=($(grep -oE '^\[([a-zA-Z0-9_-]+)\]' ~/.aws/credentials | tr -d '[]'))
     fi
 
-    # 4. The Arguments Definition
-    # -s: Allow stacking options (though not really used here)
-    # [Description]:argument_name:(list of options)
     _arguments -s \
         '-a[Target architecture]:architecture:($architectures)' \
         '-p[AWS Profile to use]:profile:($profiles)' \
@@ -38,4 +34,5 @@ _k8s-image-auditor() {
         '-h[Show help message]'
 }
 
-_k8s_image_auditor "$@"
+# The recursive call MUST match the function name exactly (hyphens)
+_k8s-image-auditor "$@"
