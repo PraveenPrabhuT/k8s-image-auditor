@@ -21,7 +21,6 @@ _k8s-image-auditor() {
         'ap-southeast-1:Singapore'
         'ap-southeast-2:Sydney'
     )
-
     # 3. Dynamic AWS Profile Scraper
     # Reads ~/.aws/credentials to suggest real profile names
     if [[ -r ~/.aws/credentials ]]; then
