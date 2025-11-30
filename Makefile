@@ -58,9 +58,9 @@ install: check all
 	@install -m 644 $(COMPLETION_SRC) $(COMPLETION_DIR)/$(BINARY_NAME)
 
 	@echo "✅ Installation complete!"
-	@# Check if the bin directory is in the user's PATH
+	@# Check if the bin directory is in the user's PATH (Handle trailing slash)
 	@case ":$$PATH:" in \
-		*":$(BINDIR):"*) ;; \
+		*":$(BINDIR):"*|*":$(BINDIR)/:"*) ;; \
 		*) echo "⚠️  WARNING: $(BINDIR) is not in your \$$PATH. Add it to your shell profile." ;; \
 	esac
 
