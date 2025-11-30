@@ -1,0 +1,57 @@
+project_name: k8s-image-auditor
+
+# 1. Build: We skip this because it's Bash, not a compiled binary.
+builds:
+  - skip: true
+
+# 2. Archive: How to zip up the source code for the release.
+archives:
+  - id: default
+    format: tar.gz
+    # This creates a standard folder structure inside the tarball
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    # We explicitly include the files needed for 'make install' to work
+    files:
+      - src: k8s-image-auditor.sh
+      - src: Makefile
+      - src: k8s-image-auditor.1.md
+      - src: completions.bash
+      - src: _k8s-image-auditor
+
+# 3. Checksums: Required for Homebrew
+checksum:
+  name_template: 'checksums.txt'
+
+# 4. Homebrew: The Magic Step
+brews:
+  - name: k8s-image-auditor
+    
+    # The repository where the Formula will be pushed
+    repository:
+      owner: PraveenPrabhuT
+      name: homebrew-tap # Your tap repo name
+      token: "{{ .Env.GORELEASER_TOKEN }}"
+
+    # Description for the Formula
+    description: "Audits container images for architecture compatibility"
+    homepage: "https://github.com/PraveenPrabhuT/k8s-image-auditor"
+    license: "MIT"
+
+    # Runtime Dependencies (must match what we wrote manually before)
+    dependencies:
+      - name: jq
+      - name: kubernetes-cli
+      - name: skopeo
+      - name: awscli
+
+    # Build Dependencies
+    build_dependencies:
+      - name: pandoc
+
+    # The Install Command
+    # GoReleaser injects this ruby code into the Formula
+    install: |
+      system "make", "install", "PREFIX=#{prefix}"
+    
+    test: |
+      assert_match "Usage:", shell_output("#{bin}/k8s-image-auditor -h")
