@@ -1,13 +1,10 @@
 #compdef k8s-image-auditor
 # This is a native Zsh completion script.
 # It provides rich dropdown menus for Architectures, Regions, and AWS Profiles.
-
 _k8s-image-auditor() {
     local -a architectures regions profiles
-
     # 1. Static list of common architectures
     architectures=('amd64' 'arm64' 'arm' 'v7' 'v8' 'ppc64le' 's390x')
-
     # 2. Static list of common AWS Regions
     regions=(
         'ap-south-1:Mumbai'
